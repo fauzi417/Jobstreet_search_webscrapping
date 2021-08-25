@@ -2,27 +2,44 @@ from bs4 import BeautifulSoup
 import requests
 import time
 
-print("Put skills you unfamiliar with")
-unfamiliar_skill = input('>')
-print(f"filtering {unfamiliar_skill}")
+print("Put Keyword, job title, or company")
+key = input(">")
+print("Put Area, city, or town")
+area = input(">")
+keyword = key.replace(' ','-')
+areas = area.replace(' ','-')
+print('')
+
 def find_jobs():
-    html_text = requests.get('https://www.timesjobs.com/candidate/job-search.html?searchType=personalizedSearch&from=submit&txtKeywords=python&txtLocation=').text
+    if area == "":
+        html_text = requests.get(f'https://www.jobstreet.co.id/en/job-search/{keyword}-jobs/?sort=createdAt').text
+    else:
+        html_text = requests.get(f'https://www.jobstreet.co.id/en/job-search/{keyword}-jobs-in-{area}/?sort=createdAt').text
     soup = BeautifulSoup(html_text, 'lxml')
-    jobs = soup.find_all('li', class_='clearfix job-bx wht-shd-bx')
-    for job in jobs:
-        job_date = job.find('span', class_='sim-posted').span.text
-        if 'few' in job_date:
-            company_name = job.find('h3', class_='joblist-comp-name').text.replace(' ','')
-            skills = job.find('span',class_='srp-skills').text.replace(' ','')
-            more_info = job.header.h2.a['href']
-            if unfamiliar_skill not in skills:
-                print(f"Company Name:{company_name.strip()}")
-                print(f"Required Skills:{skills.strip()}")
-                print(f"More Info:{more_info}")
-                print('')
+    list_of_jobs = soup.find_all('article', class_='sx2jih0 sx2jih1 zcydq88 zcydq83c zcydq81q _58veS_0')
+    for jobs in list_of_jobs:
+        company_name = jobs.find('span', class_='sx2jih0 zcydq82c _18qlyvc0 _18qlyvcv _18qlyvc1 _18qlyvc8')
+        if type(company_name)==type(None):
+            company_name = jobs.find('span', class_='sx2jih0 zcydq83 zcydq82g').text
+        else:
+            company_name = jobs.find('span', class_='sx2jih0 zcydq82c _18qlyvc0 _18qlyvcv _18qlyvc1 _18qlyvc8').text
+        job_name = jobs.find('h1', class_='sx2jih0 zcydq82c _18qlyvc0 _18qlyvcv _18qlyvc3 _18qlyvc8').text
+        link = jobs.h1.a['href']
+        location_and_salary = jobs.find_all('span',class_='sx2jih0 zcydq82c _18qlyvc0 _18qlyvcv _18qlyvc3 _18qlyvc6')
+        location = location_and_salary[0].text
+        salary = "not defined"
+        if len(location_and_salary)>1:
+            salary = location_and_salary[1].text
+        print(f"Position: {job_name}")
+        print(f"Company: {company_name}")
+        print(f"Location: {location}")
+        print(f"Salary: {salary}")
+        print(f"More Info: https://www.jobstreet.co.id{link}")
+        print('')
 
 if __name__ == '__main__':
     while True:
         find_jobs()
-        time_wait=1
-        time.sleep(time_wait * 60)
+        minutes=1
+        time.sleep(minutes * 60)
+
