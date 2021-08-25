@@ -1,0 +1,11 @@
+put keyword, job title, or company you want to search
+put area, city, or town you want the job located
+
+output will show
+1. position the job offer
+2. company name
+3. location that available
+4. salary (per month or year)
+5. link for applying the job and provide more info about the job
+
+line 40 is for automation, how long you want to automaticly repeat the search process (change variable minutes)
